@@ -16,6 +16,9 @@ app.post("/deploy/webhooks", function (req, res) {
     if(payload && payload.ref && payload.ref.indexOf('master')>=0) {
       deploy(res);
     }
+    else {
+      res.sendStatus(200);
+    }
   }
   else {
     res.sendStatus(200);
