@@ -4,33 +4,33 @@ var app = express();
 var childProcess = require('child_process');
 
 app.use(bodyParser.urlencoded({extended: true}));
-app.post("/webhooks/github", function (req, res) {
-  console.log(req.body.payload.ref);
+app.post("/deploy/webhooks", function (req, res) {
   if(req.body && req.body.payload) {
-    var payload = null 
+    var payload = null
     try {
       payload = JSON.parse(req.body.payload);
     }
     catch(err) {
-      res.send(400);
+      res.sendStatus(400);
     }
-    if(payload.ref.indexOf('master')>=0) {
+    if(payload && payload.ref && payload.ref.indexOf('master')>=0) {
       deploy(res);
     }
   }
   else {
-    res.send(200);
+    res.sendStatus(200);
   }
 })
 
 function deploy(res){
-  childProcess.exec('cd /home/www/deploy/ && ./deploy.sh', function(err, stdout, stderr){
+  childProcess.exec('cd /home/www/deploy/ && ./deploy.sh',{uid:1000}, function(err, stdout, stderr){
       if (err) {
         console.error(err);
-        return res.send(500);
+        return res.sendStatus(500);
       }
-      res.send(200);
+        console.log(stdout,stderr);
+      res.sendStatus(200);
     });
 }
 
-app.listen(80, () => console.log(`Example app listening on port 80!`))
+app.listen(8010, () => console.log(`Example app listening on port 8010!`))
